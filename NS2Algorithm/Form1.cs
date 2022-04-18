@@ -20,16 +20,15 @@ namespace NS2Algorithm
         public Form1()
         {
             InitializeComponent();
-        }
-        private void runClick(object sender, EventArgs e)
-        {
             key11.Text = "203";
             key12.Text = "567";
             key21.Text = "765";
             key22.Text = "327";
             key31.Text = "599";
             key32.Text = "423";
-
+        }
+        private void runClick(object sender, EventArgs e)
+        {
             if(int.TryParse(key11.Text, out int OU) && int.TryParse(key12.Text, out OU) && int.TryParse(key21.Text, out OU) && int.TryParse(key22.Text, out OU) && int.TryParse(key31.Text, out OU) && int.TryParse(key32.Text , out OU))
             {
                 warning.Text = "";
@@ -39,19 +38,28 @@ namespace NS2Algorithm
                 encryptBox.Text = encryptText(chars);
                 chars = encryptBox.Text.ToCharArray();
                 setVertex(int.Parse(key11.Text), int.Parse(key12.Text), int.Parse(key21.Text), int.Parse(key22.Text), int.Parse(key31.Text), int.Parse(key32.Text));
-                char s = '똿';
-                int val = (int)s;
-                string hexval = val.ToString("X4");
-                int values = Convert.ToInt32(hexval, 16);
-                string strvalue = Char.ConvertFromUtf32(values);
+                /*
+                string s = "😁";
+                int i = 0, values = 0;
+                int val;
+                string hexval;
+                String strvalue = " ";
+                
+                val = (int)s[0] + (int)s[1];                    
+                hexval = val.ToString("X4");
+                values += Convert.ToInt32(hexval , 16);
+                strvalue = Char.ConvertFromUtf32(values);                
                 char c = (char)values;
-                decryptBox.Text = decryptText(chars)+ " " + c; 
+                */
+                decryptBox.Text = decryptText(chars); 
             }
             else
             {
                 warning.Text = " Try only numerical digits 0-9 ";
             }
         }
+
+        // finds character in the array. Soon to be removed after finding an alternate way to 
         public static int findCharacter(char findable)
         {
             for (int i = 0; i < alphabets.Length; i++)
@@ -61,27 +69,37 @@ namespace NS2Algorithm
             }
             return -1;
         }
+
         // encryption magic happens here !!!
         public static string encryptText(char[] message)
         {
-            int key;
+            int key = 0;
+            int[] keys = new int[50];
             for (int i = 0; i < message.Length; i++)
             {
-                key = calculateCenter() % 63;
+                key = calculateCenter() % 50;
+                Console.WriteLine(key);
                 int numChar = findCharacter(message[i]);
-                message[i] = alphabets[(numChar + key) % 63];
+                message[i] += (char)((int)message[i] + key);
+                keys[i] = key;
             }
+
             return new string(message);
         }
         //decryption sorcery happen here !!!
         public static string decryptText(char[] message)
         {
-            int key;
+            int key = 0;
+            int[] keys = new int[50];
+
             for (int i = 0; i < message.Length; i++)
             {
-                key = calculateCenter() % 63;
+                key = calculateCenter() % 50;
+                Console.WriteLine("D" + key);
                 int numChar = findCharacter(message[i]);
-                message[i] = alphabets[(numChar - key + 63) % 63];
+                message[i] += (char)((int)message[i] - key);
+                keys[i] = key;
+
             }
             return new string(message);
         }
