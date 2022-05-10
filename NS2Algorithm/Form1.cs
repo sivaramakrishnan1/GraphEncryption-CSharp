@@ -20,6 +20,7 @@ namespace NS2Algorithm
         public Form1()
         {
             InitializeComponent();
+
             key11.Text = "203";
             key12.Text = "567";
             key21.Text = "765";
@@ -31,27 +32,18 @@ namespace NS2Algorithm
         {
             if(int.TryParse(key11.Text, out int OU) && int.TryParse(key12.Text, out OU) && int.TryParse(key21.Text, out OU) && int.TryParse(key22.Text, out OU) && int.TryParse(key31.Text, out OU) && int.TryParse(key32.Text , out OU))
             {
-                warning.Text = "";
+                warning.Text = null;
                 setVertex(int.Parse(key11.Text), int.Parse(key12.Text), int.Parse(key21.Text), int.Parse(key22.Text), int.Parse(key31.Text), int.Parse(key32.Text));
-                string plainText = inputBox.Text;
-                char[] chars = plainText.ToCharArray();
-                encryptBox.Text = encryptText(chars);
-                chars = encryptBox.Text.ToCharArray();
-                setVertex(int.Parse(key11.Text), int.Parse(key12.Text), int.Parse(key21.Text), int.Parse(key22.Text), int.Parse(key31.Text), int.Parse(key32.Text));
-                /*
-                string s = "😁";
-                int i = 0, values = 0;
-                int val;
-                string hexval;
-                String strvalue = " ";
                 
-                val = (int)s[0] + (int)s[1];                    
-                hexval = val.ToString("X4");
-                values += Convert.ToInt32(hexval , 16);
-                strvalue = Char.ConvertFromUtf32(values);                
-                char c = (char)values;
-                */
-                decryptBox.Text = decryptText(chars); 
+                string plainText = inputBox.Text;
+                encryptBox.Text = encryptText(plainText);
+                string encoded = encryptBox.Text;
+
+                setVertex(int.Parse(key11.Text), int.Parse(key12.Text), int.Parse(key21.Text), int.Parse(key22.Text), int.Parse(key31.Text), int.Parse(key32.Text));
+                 
+                StringBuilder decoded = new StringBuilder();
+                decoded.Append(decryptText(encoded.ToString()));
+                decryptBox.Text = decoded.ToString();
             }
             else
             {
@@ -59,7 +51,7 @@ namespace NS2Algorithm
             }
         }
 
-        // finds character in the array. Soon to be removed after finding an alternate way to 
+        // finds character in the array. Soon to be removed after finding an alternate way 
         public static int findCharacter(char findable)
         {
             for (int i = 0; i < alphabets.Length; i++)
@@ -71,38 +63,34 @@ namespace NS2Algorithm
         }
 
         // encryption magic happens here !!!
-        public static string encryptText(char[] message)
+        public static string encryptText(string message)
         {
             int key = 0;
-            int[] keys = new int[50];
+            StringBuilder enc = new StringBuilder();
+
             for (int i = 0; i < message.Length; i++)
             {
-                key = calculateCenter() % 50;
-                Console.WriteLine(key);
-                int numChar = findCharacter(message[i]);
-                message[i] += (char)((int)message[i] + key);
-                keys[i] = key;
+                key = calculateCenter();
+                enc.Append((char)((int)message[i] + key));
             }
 
-            return new string(message);
+            return enc.ToString();
         }
         //decryption sorcery happen here !!!
-        public static string decryptText(char[] message)
+        public static string decryptText(string message)
         {
             int key = 0;
-            int[] keys = new int[50];
+            StringBuilder dec = new StringBuilder();
 
             for (int i = 0; i < message.Length; i++)
             {
-                key = calculateCenter() % 50;
-                Console.WriteLine("D" + key);
-                int numChar = findCharacter(message[i]);
-                message[i] += (char)((int)message[i] - key);
-                keys[i] = key;
-
+                key = calculateCenter();
+                dec.Append((char)((int)message[i] - key));
             }
-            return new string(message);
+
+            return dec.ToString();
         }
+
         //vertex is predefined here. 
         public static void setVertex(int var1, int var2, int var3, int var4, int var5, int var6)
         {
@@ -119,8 +107,9 @@ namespace NS2Algorithm
             vertex[2, 0] = privateKey2[0];
             vertex[2, 1] = privateKey2[1];
         }
+
         // this function finds new vertex coordinates using the existing vertex coordinates as midpoints of sides of the triangle.
-        public static void midpointsToVertex()
+        public static void midpointsFromVertex()
         {
             int[] currentX = { 0, 0 }, currentY = { 0, 0 }, currentZ = { 0, 0 };
 
@@ -137,6 +126,8 @@ namespace NS2Algorithm
             vertex[2, 0] = currentZ[0];
             vertex[2, 0] = currentZ[1];
         }
+
+        // clears all the keys in GUI when user clicks "Clear keys" button.
         private void ClearKeys(object sender, EventArgs e)
         {
             key11.Text = "";
@@ -148,8 +139,9 @@ namespace NS2Algorithm
             decryptBox.Text = "";
             encryptBox.Text = "";
         }
+
         // this function finds new vertex coordinates using the midpoints of sides of the triangle by existing vertex coordinates.
-        public static void vertexToMidpoints()
+        public static void vertexFromMidpoints()
         {
             int[] currentX = { 0, 0 }, currentY = { 0, 0 }, currentZ = { 0, 0 };
 
@@ -166,6 +158,7 @@ namespace NS2Algorithm
             vertex[2, 0] = currentZ[0];
             vertex[2, 0] = currentZ[1];
         }
+
         // This calculates the centroid of the triangle and also maintains the growth and shrink of the triangle
         public static int calculateCenter()
         {
@@ -178,9 +171,9 @@ namespace NS2Algorithm
             counter++;
 
             if (increaseTriangle)
-                midpointsToVertex();
+                midpointsFromVertex();
             else
-                vertexToMidpoints();
+                vertexFromMidpoints();
 
             centroid[0] = (vertex[0, 0] + vertex[1, 0] + vertex[2, 0]) / 3;
             centroid[1] = (vertex[0, 1] + vertex[1, 1] + vertex[2, 1]) / 3;
